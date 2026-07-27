@@ -13,6 +13,11 @@ export async function POST(req: NextRequest) {
     ownerLabel,
     lyricGuidanceScale,
     numberOfSteps,
+    guidanceScale,
+    tagGuidanceScale,
+    scheduler,
+    guidanceType,
+    seed,
   } = body as {
     title?: string;
     tags?: string;
@@ -21,6 +26,11 @@ export async function POST(req: NextRequest) {
     ownerLabel?: string;
     lyricGuidanceScale?: number;
     numberOfSteps?: number;
+    guidanceScale?: number;
+    tagGuidanceScale?: number;
+    scheduler?: "euler" | "heun";
+    guidanceType?: "cfg" | "apg" | "cfg_star";
+    seed?: number;
   };
 
   if (!tags || !tags.trim()) {
@@ -52,6 +62,11 @@ export async function POST(req: NextRequest) {
       duration,
       lyricGuidanceScale,
       numberOfSteps,
+      guidanceScale,
+      tagGuidanceScale,
+      scheduler,
+      guidanceType,
+      seed,
     });
 
     await updateTrack(id, {

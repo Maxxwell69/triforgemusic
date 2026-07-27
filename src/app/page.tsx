@@ -44,6 +44,11 @@ export default function GeneratePage() {
   const [ownerLabel, setOwnerLabel] = useState("");
   const [lyricGuidanceScale, setLyricGuidanceScale] = useState(0.75);
   const [numberOfSteps, setNumberOfSteps] = useState(27);
+  const [guidanceScale, setGuidanceScale] = useState(15);
+  const [tagGuidanceScale, setTagGuidanceScale] = useState(5);
+  const [scheduler, setScheduler] = useState<"euler" | "heun">("euler");
+  const [guidanceType, setGuidanceType] = useState<"cfg" | "apg" | "cfg_star">("apg");
+  const [seed, setSeed] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerateResult | null>(null);
@@ -70,6 +75,11 @@ export default function GeneratePage() {
           ownerLabel,
           lyricGuidanceScale,
           numberOfSteps,
+          guidanceScale,
+          tagGuidanceScale,
+          scheduler,
+          guidanceType,
+          seed: seed.trim() ? Number(seed) : undefined,
         }),
       });
       const data = await res.json();
@@ -239,6 +249,85 @@ export default function GeneratePage() {
               <p className="text-xs text-neutral-500">
                 More steps = more coherent detail, at the cost of generation
                 time. ~27 is a good default; gains fade out past ~60.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium">
+                Guidance scale (tags+lyrics overall): {guidanceScale}
+              </label>
+              <input
+                type="range"
+                min={5}
+                max={20}
+                step={0.5}
+                value={guidanceScale}
+                onChange={(e) => setGuidanceScale(Number(e.target.value))}
+              />
+              <p className="text-xs text-neutral-500">
+                How strongly the whole prompt (genre + lyrics combined) steers
+                generation. 15 is the model&apos;s default and a safe starting point.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium">
+                Tag guidance scale: {tagGuidanceScale}
+              </label>
+              <input
+                type="range"
+                min={1}
+                max={10}
+                step={0.5}
+                value={tagGuidanceScale}
+                onChange={(e) => setTagGuidanceScale(Number(e.target.value))}
+              />
+              <p className="text-xs text-neutral-500">
+                How closely the genre/style tags are followed. Raise this if
+                the output isn&apos;t matching your genre tags closely enough.
+              </p>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex flex-1 flex-col gap-1">
+                <label className="text-sm font-medium">Scheduler</label>
+                <select
+                  value={scheduler}
+                  onChange={(e) => setScheduler(e.target.value as "euler" | "heun")}
+                  className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2 py-1 text-sm"
+                >
+                  <option value="euler">euler (default, faster)</option>
+                  <option value="heun">heun (slower, sometimes cleaner)</option>
+                </select>
+              </div>
+
+              <div className="flex flex-1 flex-col gap-1">
+                <label className="text-sm font-medium">Guidance type</label>
+                <select
+                  value={guidanceType}
+                  onChange={(e) =>
+                    setGuidanceType(e.target.value as "cfg" | "apg" | "cfg_star")
+                  }
+                  className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2 py-1 text-sm"
+                >
+                  <option value="apg">apg (default)</option>
+                  <option value="cfg">cfg</option>
+                  <option value="cfg_star">cfg_star</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium">Seed (optional)</label>
+              <input
+                value={seed}
+                onChange={(e) => setSeed(e.target.value)}
+                placeholder="leave blank for random"
+                className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none"
+              />
+              <p className="text-xs text-neutral-500">
+                Reuse the seed from a result you liked (shown below after
+                generating) to make small tweaks without losing the take.
               </p>
             </div>
           </div>

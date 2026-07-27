@@ -10,6 +10,11 @@ export type AceStepInput = {
   duration?: number;
   lyricGuidanceScale?: number;
   numberOfSteps?: number;
+  guidanceScale?: number;
+  tagGuidanceScale?: number;
+  scheduler?: "euler" | "heun";
+  guidanceType?: "cfg" | "apg" | "cfg_star";
+  seed?: number;
 };
 
 export type AceStepOutput = {
@@ -24,6 +29,10 @@ export type AceStepOutput = {
 // before distortion creeps in, so we default lower than the API's own default.
 const DEFAULT_LYRIC_GUIDANCE_SCALE = 0.75;
 const DEFAULT_NUMBER_OF_STEPS = 27;
+const DEFAULT_GUIDANCE_SCALE = 15;
+const DEFAULT_TAG_GUIDANCE_SCALE = 5;
+const DEFAULT_SCHEDULER = "euler";
+const DEFAULT_GUIDANCE_TYPE = "apg";
 
 export async function generateMusic(input: AceStepInput): Promise<AceStepOutput> {
   const result = await fal.subscribe("fal-ai/ace-step", {
@@ -33,6 +42,11 @@ export async function generateMusic(input: AceStepInput): Promise<AceStepOutput>
       duration: input.duration ?? 60,
       lyric_guidance_scale: input.lyricGuidanceScale ?? DEFAULT_LYRIC_GUIDANCE_SCALE,
       number_of_steps: input.numberOfSteps ?? DEFAULT_NUMBER_OF_STEPS,
+      guidance_scale: input.guidanceScale ?? DEFAULT_GUIDANCE_SCALE,
+      tag_guidance_scale: input.tagGuidanceScale ?? DEFAULT_TAG_GUIDANCE_SCALE,
+      scheduler: input.scheduler ?? DEFAULT_SCHEDULER,
+      guidance_type: input.guidanceType ?? DEFAULT_GUIDANCE_TYPE,
+      ...(input.seed !== undefined ? { seed: input.seed } : {}),
     },
     logs: false,
   });
