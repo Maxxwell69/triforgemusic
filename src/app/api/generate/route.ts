@@ -5,12 +5,22 @@ import { insertTrack, updateTrack } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { title, tags, lyrics, duration, ownerLabel } = body as {
+  const {
+    title,
+    tags,
+    lyrics,
+    duration,
+    ownerLabel,
+    lyricGuidanceScale,
+    numberOfSteps,
+  } = body as {
     title?: string;
     tags?: string;
     lyrics?: string;
     duration?: number;
     ownerLabel?: string;
+    lyricGuidanceScale?: number;
+    numberOfSteps?: number;
   };
 
   if (!tags || !tags.trim()) {
@@ -40,6 +50,8 @@ export async function POST(req: NextRequest) {
       tags: tags.trim(),
       lyrics: lyrics?.trim(),
       duration,
+      lyricGuidanceScale,
+      numberOfSteps,
     });
 
     await updateTrack(id, {
